@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অ্যাডমিন প্যানেল - মাইশা কম্পিউটার</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* অ্যাডমিন প্যানেলের জন্য বাড়তি কিছু ডিজাইন */
+        .status-pending { color: #E63946; font-weight: bold; }
+        .status-confirmed { color: #2ecc71; font-weight: bold; }
+        #admin-panel { display: none; } /* শুরুতে প্যানেল লুকানো থাকবে */
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">🔐 <strong>অ্যাডমিন ড্যাশবোর্ড</strong></div>
+    <ul class="nav-links" style="display: flex; list-style: none; gap: 15px;">
+        <li><a href="index.html" style="color: white; text-decoration: none;">শপ পেজে ফিরে যান</a></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <div id="login-section" style="text-align: center; margin-top: 50px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <h3>অ্যাডমিন লগইন</h3>
+        <input type="password" id="adminPass" placeholder="গোপন পাসওয়ার্ড দিন" style="padding: 10px; width: 200px; margin-bottom: 10px;">
+        <br>
+        <button class="btn" onclick="checkPassword()">প্রবেশ করুন</button>
+    </div>
+
+    <div id="admin-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>📋 সব অর্ডারের তালিকা</h2>
+            <button class="btn" onclick="clearAllOrders()" style="background-color: #555;">সব মুছুন</button>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>অর্ডার আইডি</th>
+                    <th>পণ্য</th>
+                    <th>ফোন নম্বর</th>
+                    <th>পেমেন্ট মেথড</th>
+                    <th>TrxID</th>
+                    <th>স্ট্যাটাস</th>
+                    <th>অ্যাকশন</th>
+                </tr>
+            </thead>
+            <tbody id="orderList">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // আপনার গোপন পাসওয়ার্ড
+    const secretCode = "maisha7364";
+
+    function checkPassword() {
+        const pass = document.getElementById('adminPass').value;
+        if (pass === secretCode) {
+            document.getElementById('login-section').style.display = "none";
+            document.getElementById('admin-panel').style.display = "block";
+            loadOrders();
+        } else {
+            alert("ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।");
+            location.reload(); // পেজ রিফ্রেশ হবে
+        }
+    }
+
+    function loadOrders() {
+        const orderList = document.getElementById('orderList');
+        const orders = JSON.parse(localStorage.getItem('myOrders')) || [];
+        
+        orderList.innerHTML = "";
+
+        orders.forEach((order, index) => {
+            const row = `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${order.product}</td>
+                    <td>${order.phone}</td>
+                    <td>${order.method.toUpperCase()}</td>
+                    <td><code>${order.trx}</code></td>
+                    <td class="${order.status === 'Confirmed' ? 'status-confirmed' : 'status-pending'}">${order.status}</td>
+                    <td>
+                        <button onclick="confirmOrder(${index})" style="background: #2ecc71; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px;">Confirm</button>
+                        <button onclick="deleteOrder(${index})" style="background: #E63946; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; margin-left: 5px;">Delete</button>
+                    </td>
+                </tr>
+            `;
+            orderList.innerHTML += row;
+        });
+    }
+
+    function confirmOrder(index) {
+        let orders = JSON.parse(localStorage.getItem('myOrders'));
+        orders[index].status = "Confirmed";
+        localStorage.setItem('myOrders', JSON.stringify(orders));
+        loadOrders(); // টেবিল আপডেট
+    }
+
+    function deleteOrder(index) {
+        if(confirm("আপনি কি এই অর্ডারটি মুছে ফেলতে চান?")) {
+            let orders = JSON.parse(localStorage.getItem('myOrders'));
+            orders.splice(index, 1);
+            localStorage.setItem('myOrders', JSON.stringify(orders));
+            loadOrders();
+        }
+    }
+
+    function clearAllOrders() {
+        if(confirm("সব অর্ডার মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা যাবে না।")) {
+            localStorage.removeItem('myOrders');
+            loadOrders();
+        }
+    }
+</script>
+
+</body>
+</html>
