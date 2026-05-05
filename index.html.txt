@@ -1,0 +1,98 @@
+#4EFF10<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মাইশা কম্পিউটার অ্যান্ড সার্ভিস</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">🖥️ <strong>মাইশা কম্পিউটার</strong></div>
+    <ul class="nav-links" style="display: flex; list-style: none; gap: 15px;">
+        <li><a href="#" style="color: white; text-decoration: none;">হোম</a></li>
+        <li><a href="admin.html" style="color: white; text-decoration: none;">অ্যাডমিন প্যানেল</a></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <h2>আমাদের শপ 🛒</h2>
+    <div class="product-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+        <div class="product-card" style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: white;">
+            <h3>RGB Gaming Mouse</h3>
+            <p>দাম: ৫০০ ৳</p>
+            <button class="btn" onclick="openPayment('RGB Mouse', 500)">অর্ডার করুন</button>
+        </div>
+    </div>
+</div>
+
+<div id="paymentModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000;">
+    <div style="background: white; width: 300px; margin: 50px auto; padding: 20px; border-radius: 10px;">
+        <h3>💳 পেমেন্ট তথ্য</h3>
+        <p id="orderInfo"></p>
+        <p>বিকাশ/নগদ (Personal): <strong>01717187364</strong></p>
+        
+        <label>আপনার ফোন নম্বর:</label>
+        <input type="text" id="customerPhone" placeholder="017xxxxxxxx" style="width: 100%; margin: 10px 0; padding: 5px;">
+        
+        <label>ট্রানজেকশন আইডি (TrxID):</label>
+        <input type="text" id="trxId" placeholder="X7R8..." style="width: 100%; margin: 10px 0; padding: 5px;">
+        
+        <label>পেমেন্ট মেথড:</label>
+        <select id="method" style="width: 100%; margin: 10px 0; padding: 5px;">
+            <option value="bkash">বিকাশ</option>
+            <option value="nagad">নগদ</option>
+        </select>
+
+        <button class="btn" onclick="submitOrder()" style="width: 100%;">অর্ডার নিশ্চিত করুন</button>
+        <button onclick="closeModal()" style="width: 100%; margin-top: 5px; background: none; border: none; color: gray; cursor: pointer;">বন্ধ করুন</button>
+    </div>
+</div>
+
+<script>
+    let selectedProduct = "";
+
+    function openPayment(name, price) {
+        selectedProduct = name;
+        document.getElementById('orderInfo').innerText = name + " - " + price + "৳";
+        document.getElementById('paymentModal').style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById('paymentModal').style.display = "none";
+    }
+
+    function submitOrder() {
+        const phone = document.getElementById('customerPhone').value;
+        const trx = document.getElementById('trxId').value;
+        const method = document.getElementById('method').value;
+
+        if (phone === "" || trx === "") {
+            alert("সবগুলো তথ্য সঠিকভাবে দিন!");
+            return;
+        }
+
+        const orderId = "ORD-" + Math.floor(Math.random() * 90000 + 10000);
+        
+        const newOrder = {
+            id: orderId,
+            product: selectedProduct,
+            phone: phone,
+            trx: trx,
+            method: method,
+            status: "Pending"
+        };
+
+        // ডাটাবেজ (localStorage) এ সেভ করা
+        let orders = JSON.parse(localStorage.getItem('myOrders')) || [];
+        orders.push(newOrder);
+        localStorage.setItem('myOrders', JSON.stringify(orders));
+
+        alert("🎉 অভিনন্দন! আপনার অর্ডার সফল হয়েছে।\nঅর্ডার আইডি: " + orderId);
+        closeModal();
+    }
+</script>
+
+</body>
+</html>
